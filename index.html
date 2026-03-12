@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Solomon Strong</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --bg2: #111111;
+      --bg3: #161616;
+      --border: #222222;
+      --border-hover: #333333;
+      --text: #e8e8e8;
+      --text-muted: #555555;
+      --text-dim: #888888;
+      --accent: #3a8c3a;
+      --accent-dim: rgba(58, 140, 58, 0.08);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 14px;
+      line-height: 1.7;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 999;
+      opacity: 0.4;
+    }
+
+    .container {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 0 32px;
+    }
+
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 20px 0;
+      background: rgba(10, 10, 10, 0.88);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 15px;
+      letter-spacing: 0.02em;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .nav-logo span { color: var(--accent); }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--accent); }
+
+    /* Hero */
+    .hero {
+      padding: 160px 0 100px;
+      opacity: 0;
+      animation: fadeUp 0.9s ease forwards 0.1s;
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(52px, 9vw, 88px);
+      font-weight: 800;
+      line-height: 0.97;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    h1 .dim { color: #2e2e2e; }
+
+    .hero-sub {
+      font-size: 13px;
+      color: var(--text-dim);
+      margin-top: 28px;
+      max-width: 440px;
+      line-height: 1.85;
+    }
+
+    .hero-sub strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .divider {
+      width: 36px;
+      height: 1px;
+      background: var(--border-hover);
+      margin: 36px 0;
+    }
+
+    .hero-meta {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .meta-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+    }
+
+    .dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* Sections */
+    section {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .section-projects {
+      opacity: 0;
+      animation: fadeUp 0.9s ease forwards 0.4s;
+    }
+
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 48px;
+    }
+
+    .section-label .num {
+      color: var(--accent);
+      font-size: 10px;
+    }
+
+    /* Project cards */
+    .projects-grid { display: grid; gap: 2px; }
+
+    .project-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      padding: 36px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.25s, background 0.25s;
+    }
+
+    .project-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.35s ease;
+    }
+
+    .project-card:hover {
+      border-color: #2a2a2a;
+      background: var(--bg3);
+    }
+
+    .project-card:hover::after {
+      transform: scaleX(1);
+    }
+
+    .project-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      gap: 16px;
+    }
+
+    .project-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.015em;
+    }
+
+    .badge {
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 2px;
+      flex-shrink: 0;
+      margin-top: 3px;
+    }
+
+    .badge-active {
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 1px solid rgba(58, 140, 58, 0.18);
+    }
+
+    .project-desc {
+      font-size: 12.5px;
+      color: var(--text-dim);
+      line-height: 1.85;
+      margin-bottom: 26px;
+      max-width: 600px;
+    }
+
+    .project-stack {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tag {
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 3px 9px;
+      border-radius: 2px;
+      background: var(--bg);
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .project-card:hover .tag { border-color: #2a2a2a; color: #666; }
+
+    .tag-accent {
+      color: var(--accent);
+      border-color: rgba(58,140,58,0.18);
+      background: var(--accent-dim);
+    }
+
+    .project-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 24px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .project-links {
+      display: flex;
+      gap: 8px;
+    }
+
+    .project-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: 6px 14px;
+      border-radius: 2px;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      background: var(--bg);
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+    }
+
+    .project-link:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-dim);
+    }
+
+    .project-link.disabled {
+      opacity: 0.3;
+      pointer-events: none;
+      cursor: default;
+    }
+
+    .project-link svg {
+      width: 11px;
+      height: 11px;
+      flex-shrink: 0;
+    }
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 36px 0;
+      opacity: 0;
+      animation: fadeUp 0.9s ease forwards 0.6s;
+    }
+
+    footer .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-copy {
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .footer-links a {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-decoration: none;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--accent); }
+
+    /* Collapsible projects */
+    .section-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .section-toggle:hover .toggle-icon { color: var(--accent); }
+
+    .toggle-icon {
+      font-size: 18px;
+      color: var(--text-muted);
+      transition: color 0.2s, transform 0.3s ease;
+      line-height: 1;
+      font-family: monospace;
+    }
+
+    .toggle-icon.open { transform: rotate(45deg); }
+
+    .projects-wrap {
+      overflow: hidden;
+      max-height: 2000px;
+      transition: max-height 0.45s ease, opacity 0.35s ease, margin-top 0.3s ease;
+      margin-top: 48px;
+      opacity: 1;
+    }
+
+    .projects-wrap.collapsed {
+      max-height: 0;
+      opacity: 0;
+      margin-top: 0;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      .container { padding: 0 20px; }
+      h1 { font-size: 44px; }
+      .project-card { padding: 24px; }
+      .nav-links { gap: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="container">
+      <a class="nav-logo" href="#">OS<span>.</span></a>
+      <ul class="nav-links">
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="mailto:sjjstrong7@gmail.com">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main>
+    <div class="container">
+
+      <div class="hero">
+        <h1>Solomon<br>Strong</h1>
+        <p class="hero-sub">
+          <strong>Computer Science</strong> student at Michigan State University. I build things at the intersection of systems, data, and the web — with an emphasis on doing them right.
+        </p>
+        <div class="divider"></div>
+        <div class="hero-meta">
+          <div class="meta-pill"><span class="dot"></span>Michigan State University</div>
+          <div class="meta-pill"><span class="dot"></span>B.S. Computer Science</div>
+          <div class="meta-pill"><span class="dot"></span>East Lansing, MI</div>
+        </div>
+      </div>
+
+      <section id="projects" class="section-projects">
+        <div class="section-label section-toggle" onclick="toggleProjects()">
+          <span><span class="num">—</span> Projects</span>
+          <span class="toggle-icon open" id="toggleIcon">+</span>
+        </div>
+
+        <div class="projects-wrap" id="projectsWrap">
+
+          <div class="project-card">
+            <div class="project-header">
+              <div class="project-name">Personal Finance Dashboard</div>
+              <div class="badge badge-active">In Progress</div>
+            </div>
+            <p class="project-desc">
+              Full-stack web application that aggregates bank and credit card transactions via the Plaid API, automatically categorizes spending, and surfaces trends through interactive charts. Features secure authentication, budget tracking, and monthly breakdowns.
+            </p>
+            <div class="project-footer">
+              <div class="project-stack">
+                <span class="tag tag-accent">Full-Stack</span>
+                <span class="tag">React</span>
+                <span class="tag">FastAPI</span>
+                <span class="tag">PostgreSQL</span>
+                <span class="tag">Plaid API</span>
+                <span class="tag">Recharts</span>
+                <span class="tag">Docker</span>
+              </div>
+              <div class="project-links">
+                <a href="https://github.com/sjjstrong/finance" target="_blank" class="project-link">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836a9.59 9.59 0 012.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+                  GitHub
+                </a>
+                <a href="#" class="project-link disabled">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                  Live Demo
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="project-card">
+            <div class="project-header">
+              <div class="project-name">Mini Relational Database</div>
+              <div class="badge badge-active">In Progress</div>
+            </div>
+            <p class="project-desc">
+              A relational SQL engine built from scratch — covering lexing, parsing, AST-based query planning, an execution engine, and a B-tree storage layer with on-disk persistence. Supports core SQL: SELECT, INSERT, UPDATE, and DELETE.
+            </p>
+            <div class="project-footer">
+              <div class="project-stack">
+                <span class="tag tag-accent">Systems</span>
+                <span class="tag">Go</span>
+                <span class="tag">B-Tree</span>
+                <span class="tag">SQL Parsing</span>
+                <span class="tag">WAL</span>
+                <span class="tag">Disk I/O</span>
+              </div>
+              <div class="project-links">
+                <a href="https://github.com/sjjstrong/database" target="_blank" class="project-link">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836a9.59 9.59 0 012.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+                  GitHub
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="project-card">
+            <div class="project-header">
+              <div class="project-name">Sports Analytics Dashboard</div>
+              <div class="badge badge-active">In Progress</div>
+            </div>
+            <p class="project-desc">
+              End-to-end data pipeline ingesting multiple seasons of NBA data via API, orchestrated with Airflow, and loaded into PostgreSQL. Visualized through a custom React dashboard with player trend analysis, team comparisons, and a game outcome prediction model.
+            </p>
+            <div class="project-footer">
+              <div class="project-stack">
+                <span class="tag tag-accent">Data Engineering</span>
+                <span class="tag">Python</span>
+                <span class="tag">Apache Airflow</span>
+                <span class="tag">PostgreSQL</span>
+                <span class="tag">React</span>
+                <span class="tag">scikit-learn</span>
+                <span class="tag">DuckDB</span>
+              </div>
+              <div class="project-links">
+                <a href="https://github.com/sjjstrong/sports" target="_blank" class="project-link">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836a9.59 9.59 0 012.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+                  GitHub
+                </a>
+                <a href="#" class="project-link disabled">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                  Live Demo
+                </a>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- end projects-wrap -->
+      </section>
+
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-copy">© 2026 Solomon Strong</div>
+      <div class="footer-links">
+        <a href="https://github.com/sjjstrong" target="_blank">GitHub</a>
+        <a href="https://www.linkedin.com/in/solomon-strong" target="_blank">LinkedIn</a>
+        <a href="mailto:sjjstrong7@gmail.com">Email</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function toggleProjects() {
+      const wrap = document.getElementById('projectsWrap');
+      const icon = document.getElementById('toggleIcon');
+      const collapsed = wrap.classList.toggle('collapsed');
+      icon.classList.toggle('open', !collapsed);
+    }
+  </script>
+
+</body>
+</html>
